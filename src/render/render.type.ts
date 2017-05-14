@@ -12,7 +12,7 @@ export class Props {
   /**
    * 页面信息
    */
-  public value?: string
+  public value?: IFullInformation
 
   /**
    * 页面配置信息

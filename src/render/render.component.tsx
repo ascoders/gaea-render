@@ -21,19 +21,9 @@ export class GaeaRender extends React.Component<Props, State> {
     // 设置外部传参 todo
     this.viewport.setParams({})
 
-    // 设置用户设置 todo
-
-    // 解析 base64 的 value
-    let unCompressValue: {
-      [instanceKey: string]: InstanceInfo
-    } = {}
-
-    if (this.props.value) {
-      unCompressValue = JSON.parse(LZString.decompressFromBase64(this.props.value))
-    }
-
-    Object.keys(unCompressValue).forEach(instanceKey => {
-      const instanceInfo = unCompressValue[instanceKey]
+    // 设置页面
+    Object.keys(this.props.value).forEach(instanceKey => {
+      const instanceInfo = this.props.value[instanceKey]
       this.viewport.instances.set(instanceKey, instanceInfo)
 
       // 设置根 mapUniqueKey
