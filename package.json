@@ -1,13 +1,13 @@
 {
   "name": "gaea-render",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "",
   "main": "built/index.js",
   "typings": "src/index.ts",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "tslint": "tslint './src/**/*.?(ts|tsx)'",
-    "prepublish": "rm -rf lib && tsc"
+    "prepublish": "rm -rf built && tsc && babel built --out-dir built"
   },
   "repository": {
     "type": "git",
@@ -29,7 +29,10 @@
     "@types/react": "^15.0.24",
     "@types/react-dom": "^15.5.0",
     "gaea-basic-components": "^1.0.3",
-    "typescript": "^2.3.2"
+    "typescript": "^2.3.2",
+    "babel-cli": "^6.24.0",
+    "babel-preset-es2015": "^6.24.0",
+    "babel-preset-stage-0": "^6.22.0"
   },
   "dependencies": {
     "lodash": "^4.17.4",
