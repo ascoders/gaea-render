@@ -52,6 +52,14 @@ declare interface IGaeaSetting {
      * Container can be dragged into component
      */
     isContainer?: boolean
+    /**
+     * 配置信息是否在获取中
+     */
+    isLoading?: boolean
+    /**
+     * 组件被点击时触发
+     */
+    onClick?: (info?: InstanceInfo) => void
 }
 
 declare interface IEditor {
@@ -69,4 +77,71 @@ declare interface IEditor {
      * Show label
      */
     label: string
+}
+
+declare interface IPage {
+    /**
+     * Can create a folder or page
+     */
+    type: "page" | "folder"
+    /**
+     * Is home page
+     */
+    isHomePage?: boolean
+    /**
+     * description name
+     */
+    name: string
+    /**
+     * Real path
+     */
+    path: string
+    parentKey: string
+    /**
+     * Only exist in folder
+     */
+    childs?: string[]
+}
+
+declare interface IPages {
+    [pageKey: string]: IPage
+}
+
+declare type InstancesArray = Array<{
+    /**
+     * The page instances belong to
+     */
+    pageKey: string
+    instances: {
+        [instanceKey: string]: InstanceInfo
+    }
+}>
+
+/**
+ * Page store structor
+ */
+declare interface IAllInformation {
+    /**
+     * All page info
+     */
+    pages: IPages
+    /**
+     * Root page keys
+     */
+    rootPageKeys: string[]
+    /**
+     * All instance info
+     */
+    instancesArray: InstancesArray
+}
+
+declare interface IPreComponent {
+    /**
+     * gaea Key
+     */
+    key: string
+    /**
+     * Pre-setting props
+     */
+    props: any
 }

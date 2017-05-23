@@ -7,6 +7,10 @@ declare interface InstanceInfo {
      */
     gaeaKey: string
     /**
+     * 预设组件专有属性，实例化 componentClass 还是根据 gaeaKey 找，但是配置会优先根据 preGaeaKey 找
+     */
+    preGaeaKey?: string
+    /**
      * Component data, all operate save here
      */
     data: {
@@ -39,6 +43,14 @@ declare interface IDragInfo {
 
 declare interface IDragInfoNew {
     gaeaKey?: string
+    /**
+     * 预设 props
+     */
+    props?: any
+    /**
+     * 预设 gaeaKey
+     */
+    preGaeaKey?: string
     targetInstanceKey?: string
     targetIndex?: number
 }
