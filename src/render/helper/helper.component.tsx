@@ -36,87 +36,70 @@ export default class RenderHelper extends React.Component<Props, State> {
     // 获取当前要渲染的组件 class
     this.componentClass = this.props.viewport.componentClasses.get(this.instanceInfo.gaeaKey)
 
-    // // 执行初始化事件
-    // this.eventData = this.props.viewport.isReactNative ? this.instanceInfo.props.gaeaNativeEventData : this.instanceInfo.props.gaeaEventData
-    // this.eventData && this.eventData.forEach(data => {
-    //   if (data.typeIndex === -1 && data.type === "init") {
-    //     this.runEvent(data)
-    //   }
-    // })
-
-    // // 监听事件
-    // this.eventData && this.eventData.forEach(data => {
-    //   if (data.typeIndex === -1 && data.type === "listen") {
-    //     const listenData = data.typeData as FitGaea.EventTriggerEvent
-    //     this.props.preview.customEvent.on(listenData.listen, this.handleRunEvent, data)
-    //   }
-    // })
+    // 执行 trigger -> init 事件
+    if (this.instanceInfo.data.events) {
+      this.instanceInfo.data.events.forEach((event: any) => {
+        switch (event.trigger) {
+          case "init":
+            this.runEvent(event)
+            break
+          case "subscribe":
+            this.props.viewport.event.on(event.triggerData.name, this.handleSubscribe)
+            break
+        }
+      })
+    }
   }
 
   public componentWillUnmount() {
-    // // 取消事件监听
-    // this.eventData && this.eventData.forEach(data => {
-    //   if (data.typeIndex === -1 && data.type === "listen") {
-    //     const listenData = data.typeData as FitGaea.EventTriggerEvent
-    //     this.props.preview.customEvent.off(listenData.listen, this.handleRunEvent)
-    //   }
-    // })
+    if (this.instanceInfo.data.events) {
+      this.instanceInfo.data.events.forEach((event: any) => {
+        if (event.trigger === "subscribe") {
+          this.props.viewport.event.off(event.triggerData.name, this.handleSubscribe)
+        }
+      })
+    }
   }
 
   /**
    * 监听事件执行了
    */
-  public handleRunEvent = (context: any) => {
+  public handleSubscribe = (context: any) => {
     this.runEvent(context)
   }
 
   /**
    * 执行事件
    */
-  public runEvent = (eventData: any) => {
-    // const effect = this.instanceInfo.props.gaeaEvent && this.instanceInfo.props.gaeaEvent.effects[eventData.eventIndex]
-    // switch (eventData.event) {
-    //   case "call":
-    //     const callData = eventData.eventData as FitGaea.EventActionCall
-    //     this.props.preview.event.emit(this.props.preview.event.onCall, {
-    //       functionName: callData.functionName,
-    //       // param: eventData.eventData
-    //     })
-    //     break
-    //   case "jumpUrl":
-    //     const jumpUrlData = eventData.eventData as FitGaea.EventActionJumpUrl
-    //     location.href = jumpUrlData.url
-    //     break
-    //   case "emit":
-    //     const emitData = eventData.eventData as FitGaea.EventActionEvent
-    //     this.props.preview.customEvent.emit(emitData.emit)
-    //     break
-    //   case "updateProps":
-    //     const updatePropsData = eventData.eventData as FitGaea.EventUpdatePropsEvent
-    //     // 只修改属性
-    //     this.instanceInfo.props = _.merge(_.cloneDeep(this.componentClass.defaultProps), _.cloneDeep(updatePropsData.props))
-    //     this.forceUpdate()
-    //     break
-    // }
+  public runEvent = (event: any, ...values: any[]) => {
+    switch (event.action) {
+      case "none":
+        // 啥都不做  
+        break
+
+      default:
+    }
   }
 
   /**
    * 返回调用自己的方法的 key -> Array<value>
    */
   public getSelfFunctionMap = () => {
-    // <string,Array<FitGaea.EventData>
     const functionMap = new Map()
-    // this.eventData && this.eventData.forEach(data => {
-    //   if (data.typeIndex > -1 && this.instanceInfo.props.gaeaEvent.triggers[data.typeIndex].selfCallback) {
-    //     if (functionMap.has(data.type)) {
-    //       const functionList = functionMap.get(data.type)
-    //       functionList.push(data)
-    //       functionMap.set(data.type, functionList)
-    //     } else {
-    //       functionMap.set(data.type, [data])
-    //     }
-    //   }
-    // })
+
+    if (this.instanceInfo.data.events) {
+      this.instanceInfo.data.events.forEach((event: any) => {
+        if (event.trigger === "callback") {
+          if (functionMap.has(event.triggerData.trigger)) {
+            const functionList = functionMap.get(event.triggerData.trigger)
+            functionList.push(event)
+            functionMap.set(event.triggerData.trigger, functionList)
+          } else {
+            functionMap.set(event.triggerData.trigger, [event])
+          }
+        }
+      })
+    }
     return functionMap
   }
 
@@ -138,14 +121,14 @@ export default class RenderHelper extends React.Component<Props, State> {
     const props: any = {}
 
     // 将回调事件添加到 props 中
-    // const functionMap = this.getSelfFunctionMap()
-    // functionMap.forEach((value: any, key: string) => {
-    //   props[key] = (...args: any[]) => {
-    //     value.forEach(eachValue => {
-    //       this.runEvent.apply(this, [eachValue, ...args])
-    //     })
-    //   }
-    // })
+    const functionMap = this.getSelfFunctionMap()
+    functionMap.forEach((value: any, key: string) => {
+      props[key] = (...args: any[]) => {
+        value.forEach((eachValue: any) => {
+          this.runEvent.apply(this, [eachValue, ...args])
+        })
+      }
+    })
 
     props.isPreview = true
 
@@ -165,19 +148,19 @@ export default class RenderHelper extends React.Component<Props, State> {
     // })
 
     // 遍历所有字符串常量的值，如果是 ${xxx.xxx} 类型，表示使用传递变量
-    Object.keys(props).forEach(propsField => {
-      if (propsField.startsWith("gaea")) {
-        return
-      }
+    // Object.keys(props).forEach(propsField => {
+    //   if (propsField.startsWith("gaea")) {
+    //     return
+    //   }
 
-      try {
-        props[propsField] = props[propsField].replace(/\$\{(.*)\}/g, (str: string, match: string) => {
-          return _.get(this.props.gaeaData, match)
-        })
-      } catch (err) {
-        //
-      }
-    })
+    //   try {
+    //     props[propsField] = props[propsField].replace(/\$\{(.*)\}/g, (str: string, match: string) => {
+    //       return _.get(this.props.gaeaData, match)
+    //     })
+    //   } catch (err) {
+    //     //
+    //   }
+    // })
 
     props.ref = (ref: React.ReactInstance) => {
       this.wrappedInstance = ref
