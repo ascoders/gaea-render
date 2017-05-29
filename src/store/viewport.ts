@@ -7,12 +7,12 @@ export default class Preview {
   /**
    * 基础组件
    */
-  public componentClasses = new Map<string, React.ComponentClass<IGaeaProps>>()
+  public componentClasses = new Map<string, React.ComponentClass<any>>()
 
   /**
    * 已实例化在编辑区域组件的集合
    */
-  public instances = new Map<string, InstanceInfo>()
+  public instances = new Map<string, any>()
 
   /**
    * 根节点的唯一 id
@@ -32,7 +32,7 @@ export default class Preview {
   /**
    * 设置基础组件
    */
-  public addComponentClass(componentClass: React.ComponentClass<IGaeaProps>) {
+  public addComponentClass(componentClass: React.ComponentClass<any>) {
     this.componentClasses.set(componentClass.defaultProps.gaeaSetting.key, componentClass)
   }
 

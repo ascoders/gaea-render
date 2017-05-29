@@ -23,8 +23,8 @@ export default class RenderHelper extends React.Component<Props, State> {
   // 内部组件实例
   public wrappedInstance: React.ReactInstance
 
-  private instanceInfo: InstanceInfo
-  private componentClass: React.ComponentClass<IGaeaProps>
+  private instanceInfo: any
+  private componentClass: React.ComponentClass<any>
 
   // 事件数据
   private eventData: any
@@ -126,7 +126,7 @@ export default class RenderHelper extends React.Component<Props, State> {
 
     // 是否可以有子元素
     if (this.componentClass.defaultProps.gaeaSetting.isContainer && this.instanceInfo.childs) {
-      childs = this.instanceInfo.childs.map(childKey => {
+      childs = this.instanceInfo.childs.map((childKey: any) => {
         return (
           <RenderHelper key={childKey}
             viewport={this.props.viewport}
