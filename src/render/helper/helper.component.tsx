@@ -1,6 +1,7 @@
 import * as _ from "lodash"
 import * as React from "react"
 import { Props, State } from "./helper.type"
+import shallowEq from "shallow-eq"
 
 // 根据类型生成处理函数
 const parser = (type: string): (value?: string) => number | string | boolean => {
@@ -28,6 +29,27 @@ export default class RenderHelper extends React.Component<Props, State> {
 
   // 事件数据
   private eventData: any
+
+  public shouldComponentUpdate(nextProps: Props, nextState: State) {
+    if (!shallowEq(this.props, nextProps)) {
+      return true
+    }
+
+    if (!shallowEq(this.state, nextState)) {
+      return true
+    }
+
+    // this.props.data 属于透传字段，如果不 shallowEq，也会刷新    
+    if (!shallowEq(this.props.data, nextProps.data)) {
+      return true
+    }
+
+    if (!shallowEq(this.state.data, nextState.data)) {
+      return true
+    }
+
+    return false
+  }
 
   public componentWillMount() {
     // 从 store 找到自己信息
@@ -76,7 +98,17 @@ export default class RenderHelper extends React.Component<Props, State> {
       case "none":
         // 啥都不做  
         break
-
+      case "passingSiblingNodes":
+        if (event.trigger === "callback") {
+          event.triggerData.triggerData.forEach((data: any, index: number) => {
+            const nextData = this.state.data
+            nextData[data.name] = values[index]
+            this.setState({
+              data: nextData
+            })
+          })
+        }
+        break
       default:
     }
   }
@@ -111,9 +143,12 @@ export default class RenderHelper extends React.Component<Props, State> {
     if (this.componentClass.defaultProps.gaeaSetting.isContainer && this.instanceInfo.childs) {
       childs = this.instanceInfo.childs.map((childKey: any) => {
         return (
-          <RenderHelper key={childKey}
+          <RenderHelper
+            key={childKey}
             viewport={this.props.viewport}
-            instanceKey={childKey} />
+            instanceKey={childKey}
+            data={this.state.data}
+          />
         )
       })
     }
@@ -130,22 +165,28 @@ export default class RenderHelper extends React.Component<Props, State> {
       }
     })
 
+    // render 模式就是 preview 模式    
     props.isPreview = true
 
-    // 将变量字段替换成变量
-    // props.gaeaVariables && Object.keys(props.gaeaVariables).forEach(variableField => {
-    //   const variable = props.gaeaVariables[variableField]
-    //   if (!variable) {
-    //     // 可能还没赋值，是 null
-    //     return
-    //   }
-    //   const myParser = parser(variable.valueType)
-    //   switch (variable.variableType) {
-    //     case "externalParameter":
-    //       props[variableField] = this.props.preview.params[variable.variableField] ? myParser(this.props.preview.params[variable.variableField]) : null
-    //       break
-    //   }
-    // })
+    props.ref = (ref: React.ReactInstance) => {
+      this.wrappedInstance = ref
+    }
+
+    // 注入 props
+    _.merge(props, _.get(this.instanceInfo, "data.props") || {})
+
+    // 实装变量设置
+    if (this.instanceInfo.variables) {
+      Object.keys(this.instanceInfo.variables).forEach((realField: string) => {
+        const variable = this.instanceInfo.variables[realField]
+        switch (variable.type) {
+          case "sibling":
+            // 同级传参，从 props 获取
+            _.set(props, "realField", this.props.data[variable.key])
+            break
+        }
+      })
+    }
 
     // 遍历所有字符串常量的值，如果是 ${xxx.xxx} 类型，表示使用传递变量
     // Object.keys(props).forEach(propsField => {
@@ -161,16 +202,6 @@ export default class RenderHelper extends React.Component<Props, State> {
     //     //
     //   }
     // })
-
-    props.ref = (ref: React.ReactInstance) => {
-      this.wrappedInstance = ref
-    }
-
-    // gaeaData 注入
-    props.gaeaData = this.props.gaeaData
-
-    // 注入 props
-    _.merge(props, _.get(this.instanceInfo, "data.props") || {})
 
     return React.createElement(this.componentClass, props, childs)
   }
