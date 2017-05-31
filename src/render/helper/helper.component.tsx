@@ -101,11 +101,13 @@ export default class RenderHelper extends React.Component<Props, State> {
       case "passingSiblingNodes":
         if (event.trigger === "callback") {
           event.triggerData.triggerData.forEach((data: any, index: number) => {
-            const nextData = this.state.data
-            nextData[data.name] = values[index]
-            this.setState({
-              data: nextData
-            })
+            if (typeof this.props.onCallback === "function") {
+              // 通知父级，让父级刷新
+              this.props.onCallback({
+                name: data.name,
+                value: values[index]
+              })
+            }
           })
         }
         break
@@ -148,6 +150,7 @@ export default class RenderHelper extends React.Component<Props, State> {
             viewport={this.props.viewport}
             instanceKey={childKey}
             data={this.state.data}
+            onCallback={this.handleCallback}
           />
         )
       })
@@ -182,7 +185,7 @@ export default class RenderHelper extends React.Component<Props, State> {
         switch (variable.type) {
           case "sibling":
             // 同级传参，从 props 获取
-            _.set(props, "realField", this.props.data[variable.key])
+            _.set(props, realField, this.props.data[variable.key])
             break
         }
       })
@@ -204,5 +207,16 @@ export default class RenderHelper extends React.Component<Props, State> {
     // })
 
     return React.createElement(this.componentClass, props, childs)
+  }
+
+  /**
+   * 子元素触发的回调
+   */
+  private handleCallback = (data: any) => {
+    const nextData = Object.assign({}, this.state.data)
+    nextData[data.name] = data.value
+    this.setState({
+      data: nextData
+    })
   }
 }

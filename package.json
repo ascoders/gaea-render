@@ -1,6 +1,6 @@
 {
   "name": "gaea-render",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "",
   "main": "built/index.js",
   "typings": "src/index.ts",
