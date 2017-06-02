@@ -14,6 +14,11 @@ export class Props {
     public data?: {
         [name: string]: any
     } = {}
+
+    /**
+     * 子组件的回调
+     */
+    onCallback?: (data?: any) => void
 }
 
 export class State {

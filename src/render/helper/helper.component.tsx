@@ -99,17 +99,18 @@ export default class RenderHelper extends React.Component<Props, State> {
         // 啥都不做  
         break
       case "passingSiblingNodes":
-        if (event.trigger === "callback") {
-          event.triggerData.triggerData.forEach((data: any, index: number) => {
-            if (typeof this.props.onCallback === "function") {
-              // 通知父级，让父级刷新
-              this.props.onCallback({
-                name: data.name,
-                value: values[index]
-              })
-            }
-          })
+        if (!event.actionData || !event.actionData.data) {
+          return
         }
+        event.actionData.data.forEach((data: any, index: number) => {
+          if (typeof this.props.onCallback === "function") {
+            // 通知父级，让父级刷新
+            this.props.onCallback({
+              name: data.name,
+              value: values[index]
+            })
+          }
+        })
         break
       default:
     }
