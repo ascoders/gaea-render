@@ -83,61 +83,6 @@ export default class RenderHelper extends React.Component<Props, State> {
     }
   }
 
-  /**
-   * 监听事件执行了
-   */
-  public handleSubscribe = (context: any) => {
-    this.runEvent(context)
-  }
-
-  /**
-   * 执行事件
-   */
-  public runEvent = (event: any, ...values: any[]) => {
-    switch (event.action) {
-      case "none":
-        // 啥都不做  
-        break
-      case "passingSiblingNodes":
-        if (!event.actionData || !event.actionData.data) {
-          return
-        }
-        event.actionData.data.forEach((data: any, index: number) => {
-          if (typeof this.props.onCallback === "function") {
-            // 通知父级，让父级刷新
-            this.props.onCallback({
-              name: data.name,
-              value: values[index]
-            })
-          }
-        })
-        break
-      default:
-    }
-  }
-
-  /**
-   * 返回调用自己的方法的 key -> Array<value>
-   */
-  public getSelfFunctionMap = () => {
-    const functionMap = new Map()
-
-    if (this.instanceInfo.data.events) {
-      this.instanceInfo.data.events.forEach((event: any) => {
-        if (event.trigger === "callback") {
-          if (functionMap.has(event.triggerData.field)) {
-            const functionList = functionMap.get(event.triggerData.field)
-            functionList.push(event)
-            functionMap.set(event.triggerData.field, functionList)
-          } else {
-            functionMap.set(event.triggerData.field, [event])
-          }
-        }
-      })
-    }
-    return functionMap
-  }
-
   public render() {
     // 子元素
     let childs: Array<React.ReactElement<any>> = null
@@ -211,13 +156,71 @@ export default class RenderHelper extends React.Component<Props, State> {
   }
 
   /**
-   * 子元素触发的回调
+   * 子元素触发的回调，用来触发同层级传值的事件
    */
   private handleCallback = (data: any) => {
-    const nextData = Object.assign({}, this.state.data)
-    nextData[data.name] = data.value
-    this.setState({
-      data: nextData
+    this.setState(state => {
+      return {
+        ...state,
+        data: Object.assign({}, state.data, {
+          [data.name]: data.value
+        })
+      }
     })
+  }
+
+  /**
+   * 监听事件执行了
+   */
+  private handleSubscribe = (context: any) => {
+    this.runEvent(context)
+  }
+
+  /**
+   * 执行事件
+   */
+  private runEvent = (event: any, ...values: any[]) => {
+    switch (event.action) {
+      case "none":
+        // 啥都不做  
+        break
+      case "passingSiblingNodes":
+        if (!event.actionData || !event.actionData.data) {
+          return
+        }
+        event.actionData.data.forEach((data: any, index: number) => {
+          if (typeof this.props.onCallback === "function") {
+            // 通知父级，让父级刷新
+            this.props.onCallback({
+              name: data.name,
+              value: values[index]
+            })
+          }
+        })
+        break
+      default:
+    }
+  }
+
+  /**
+   * 返回调用自己的方法的 key -> Array<value>
+   */
+  private getSelfFunctionMap = () => {
+    const functionMap = new Map()
+
+    if (this.instanceInfo.data.events) {
+      this.instanceInfo.data.events.forEach((event: any) => {
+        if (event.trigger === "callback") {
+          if (functionMap.has(event.triggerData.field)) {
+            const functionList = functionMap.get(event.triggerData.field)
+            functionList.push(event)
+            functionMap.set(event.triggerData.field, functionList)
+          } else {
+            functionMap.set(event.triggerData.field, [event])
+          }
+        }
+      })
+    }
+    return functionMap
   }
 }
