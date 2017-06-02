@@ -125,12 +125,12 @@ export default class RenderHelper extends React.Component<Props, State> {
     if (this.instanceInfo.data.events) {
       this.instanceInfo.data.events.forEach((event: any) => {
         if (event.trigger === "callback") {
-          if (functionMap.has(event.triggerData.trigger)) {
-            const functionList = functionMap.get(event.triggerData.trigger)
+          if (functionMap.has(event.triggerData.field)) {
+            const functionList = functionMap.get(event.triggerData.field)
             functionList.push(event)
-            functionMap.set(event.triggerData.trigger, functionList)
+            functionMap.set(event.triggerData.field, functionList)
           } else {
-            functionMap.set(event.triggerData.trigger, [event])
+            functionMap.set(event.triggerData.field, [event])
           }
         }
       })
