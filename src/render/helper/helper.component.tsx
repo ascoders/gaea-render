@@ -31,20 +31,13 @@ export default class RenderHelper extends React.Component<Props, State> {
   private eventData: any
 
   public shouldComponentUpdate(nextProps: Props, nextState: State) {
-    if (!shallowEq(this.props, nextProps)) {
+    // state 浅相等，排除 data。并且 data 深相等，认为数据没变
+    if (!shallowEq(this.state, nextState, ["data"]) || !_.isEqual(this.state.data, nextState.data)) {
       return true
     }
 
-    if (!shallowEq(this.state, nextState)) {
-      return true
-    }
-
-    // this.props.data 属于透传字段，如果不 shallowEq，也会刷新    
-    if (!shallowEq(this.props.data, nextProps.data)) {
-      return true
-    }
-
-    if (!shallowEq(this.state.data, nextState.data)) {
+    // props 浅相等，排除 data。并且 data 深相等，认为数据没变
+    if (!shallowEq(this.props, nextProps, ["data"]) || !_.isEqual(this.props.data, nextProps.data)) {
       return true
     }
 
@@ -89,16 +82,24 @@ export default class RenderHelper extends React.Component<Props, State> {
 
     // 是否可以有子元素
     if (this.componentClass.defaultProps.gaeaSetting.isContainer && this.instanceInfo.childs) {
-      childs = this.instanceInfo.childs.map((childKey: any) => {
-        return (
-          <RenderHelper
-            key={childKey}
-            viewport={this.props.viewport}
-            instanceKey={childKey}
-            data={this.state.data}
-            onCallback={this.handleCallback}
-          />
-        )
+      childs = this.instanceInfo.childs.map((childKey: any, index: number) => {
+        const childProps: any = {
+          key: childKey,
+          viewport: this.props.viewport,
+          instanceKey: childKey,
+          onCallback: this.handleCallback
+        }
+
+        const childInstance = this.props.viewport.instances.get(childKey)
+        if (childInstance.variables) {
+          childProps.data = {}
+          Object.keys(childInstance.variables).forEach((realField: string) => {
+            const variable = childInstance.variables[realField]
+            childProps.data[variable.key] = this.state.data[variable.key]
+          })
+        }
+
+        return React.createElement(RenderHelper, childProps)
       })
     }
 
