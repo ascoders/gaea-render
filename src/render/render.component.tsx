@@ -1,4 +1,3 @@
-import gaeaBasicComponents from "gaea-basic-components"
 import * as _ from "lodash"
 import * as LZString from "lz-string"
 import * as React from "react"
@@ -14,7 +13,7 @@ export class GaeaRender extends React.Component<Props, State> {
 
   public componentWillMount() {
     // 设置基础组件
-    gaeaBasicComponents.concat(this.props.componentClasses).forEach(componentClass => {
+    this.props.componentClasses.forEach(componentClass => {
       this.viewport.addComponentClass(componentClass)
     })
 
