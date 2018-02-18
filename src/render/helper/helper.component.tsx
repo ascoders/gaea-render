@@ -81,7 +81,7 @@ export default class RenderHelper extends React.Component<Props, State> {
     let childs: Array<React.ReactElement<any>> = null
 
     // 是否可以有子元素
-    if (this.componentClass.defaultProps.gaeaSetting.isContainer && this.instanceInfo.childs) {
+    if (this.componentClass.defaultProps.editSetting.isContainer && this.instanceInfo.childs) {
       childs = this.instanceInfo.childs.map((childKey: any, index: number) => {
         const childProps: any = {
           key: childKey,
