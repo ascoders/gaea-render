@@ -33,7 +33,7 @@ export default class Preview {
    * 设置基础组件
    */
   public addComponentClass(componentClass: React.ComponentClass<any>) {
-    this.componentClasses.set(componentClass.defaultProps.gaeaSetting.key, componentClass)
+    this.componentClasses.set(componentClass.defaultProps.editSetting.key, componentClass)
   }
 
   /**
