@@ -18,7 +18,7 @@ export class Props {
     /**
      * 子组件的回调
      */
-    onCallback?: (data?: any) => void
+    public onCallback?: (data?: any) => void
 }
 
 export class State {

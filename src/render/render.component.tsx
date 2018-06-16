@@ -1,41 +1,41 @@
-import * as _ from "lodash"
-import * as LZString from "lz-string"
-import * as React from "react"
-import ViewportStore from "../store/viewport"
-import Helper from "./helper/helper.component"
-import { Props, State } from "./render.type"
+import * as React from 'react';
+import ViewportStore from '../store/viewport';
+import Helper from './helper/helper.component';
+import { Props, State } from './render.type';
 
 export class GaeaRender extends React.Component<Props, State> {
-  public static defaultProps = new Props()
-  public state = new State()
+  public static defaultProps = new Props();
+  public state = new State();
 
-  private viewport = new ViewportStore()
+  private viewport = new ViewportStore();
 
   public componentWillMount() {
     // 设置基础组件
     this.props.componentClasses.forEach(componentClass => {
-      this.viewport.addComponentClass(componentClass)
-    })
+      this.viewport.addComponentClass(componentClass);
+    });
 
     // 设置外部传参 todo
-    this.viewport.setParams({})
+    this.viewport.setParams({});
 
     // 设置页面
-    Object.keys(this.props.value).forEach(instanceKey => {
-      const instanceInfo = this.props.value[instanceKey]
-      this.viewport.instances.set(instanceKey, instanceInfo)
+    if (this.props.value) {
+      Object.keys(this.props.value).forEach(instanceKey => {
+        const instanceInfo = this.props.value[instanceKey];
+        this.viewport.instances.set(instanceKey, instanceInfo);
 
-      // 设置根 mapUniqueKey
-      if (instanceInfo.parentInstanceKey === null) {
-        this.viewport.setRootUniqueId(instanceKey)
-      }
-    })
+        // 设置根 mapUniqueKey
+        if (instanceInfo.parentInstanceKey === null) {
+          this.viewport.setRootUniqueId(instanceKey);
+        }
+      });
+    }
 
-    this.viewport.event.on(this.viewport.event.onCall, this.handleOnCall)
+    this.viewport.event.on(this.viewport.event.onCall, this.handleOnCall);
   }
 
   public componentWillUnmount() {
-    this.viewport.event.off(this.viewport.event.onCall, this.handleOnCall)
+    this.viewport.event.off(this.viewport.event.onCall, this.handleOnCall);
   }
 
   /**
@@ -43,18 +43,15 @@ export class GaeaRender extends React.Component<Props, State> {
    */
   public handleOnCall = (context: any, eventData: any) => {
     if (this.props.onCall) {
-      this.props.onCall(eventData.functionName, eventData.param)
+      this.props.onCall(eventData.functionName, eventData.param);
     }
-  }
+  };
 
   public render() {
     if (!this.viewport.rootInstanceKey) {
-      return null
+      return null;
     }
 
-    return (
-      <Helper viewport={this.viewport}
-        instanceKey={this.viewport.rootInstanceKey} />
-    )
+    return <Helper viewport={this.viewport} instanceKey={this.viewport.rootInstanceKey} />;
   }
 }
