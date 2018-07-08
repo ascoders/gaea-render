@@ -9,7 +9,9 @@
     "preview": "pri preview",
     "analyse": "pri analyse",
     "test": "pri test",
-    "prepublishOnly": "npm run build"
+    "prepublishOnly": "npm run build",
+    "docs": "pri docs",
+    "format": "tslint --fix './src/**/*.?(ts|tsx)' && prettier --write './src/**/*.?(ts|tsx)'"
   },
   "repository": {
     "type": "git",
@@ -24,7 +26,8 @@
   "dependencies": {
     "gaea-basic-components": "^1.1.1",
     "lodash": "^4.17.4",
-    "shallow-eq": "^1.0.5"
+    "shallow-eq": "^1.0.5",
+    "@babel/runtime": "^7.0.0-beta.51"
   },
   "devDependencies": {
     "pri": "^0.9.16"
