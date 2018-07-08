@@ -54,12 +54,12 @@ export default class RenderHelper extends React.Component<Props, State> {
     // 执行 trigger -> init 事件
     if (this.instanceInfo.data.events) {
       this.instanceInfo.data.events.forEach((event: any) => {
-        switch (event.trigger) {
+        switch (event.trigger.type) {
           case 'init':
             this.runEvent(event);
             break;
           case 'subscribe':
-            this.props.viewport.event.on(event.triggerData.name, this.handleSubscribe);
+            this.props.viewport.event.on(event.trigger.name, this.handleSubscribe);
             break;
         }
       });
@@ -69,8 +69,8 @@ export default class RenderHelper extends React.Component<Props, State> {
   public componentWillUnmount() {
     if (this.instanceInfo.data.events) {
       this.instanceInfo.data.events.forEach((event: any) => {
-        if (event.trigger === 'subscribe') {
-          this.props.viewport.event.off(event.triggerData.name, this.handleSubscribe);
+        if (event.trigger.type === 'subscribe') {
+          this.props.viewport.event.off(event.trigger.name, this.handleSubscribe);
         }
       });
     }
@@ -182,9 +182,8 @@ export default class RenderHelper extends React.Component<Props, State> {
    * 执行事件
    */
   private runEvent = (event: any, ...values: any[]) => {
-    switch (event.action) {
+    switch (event.action.type) {
       case 'none':
-        // 啥都不做
         break;
       case 'passingSiblingNodes':
         if (!event.actionData || !event.actionData.data) {
@@ -200,6 +199,8 @@ export default class RenderHelper extends React.Component<Props, State> {
           }
         });
         break;
+      case 'jump':
+        window.open(event.action.url);
       default:
     }
   };
@@ -212,13 +213,13 @@ export default class RenderHelper extends React.Component<Props, State> {
 
     if (this.instanceInfo.data.events) {
       this.instanceInfo.data.events.forEach((event: any) => {
-        if (event.trigger === 'callback') {
-          if (functionMap.has(event.triggerData.field)) {
-            const functionList = functionMap.get(event.triggerData.field);
+        if (event.trigger.type === 'callback') {
+          if (functionMap.has(event.trigger.field)) {
+            const functionList = functionMap.get(event.trigger.field);
             functionList.push(event);
-            functionMap.set(event.triggerData.field, functionList);
+            functionMap.set(event.trigger.field, functionList);
           } else {
-            functionMap.set(event.triggerData.field, [event]);
+            functionMap.set(event.trigger.field, [event]);
           }
         }
       });
