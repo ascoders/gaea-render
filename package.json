@@ -27,7 +27,7 @@
     "shallow-eq": "^1.0.5"
   },
   "devDependencies": {
-    "pri": "^0.9.3"
+    "pri": "^0.9.16"
   },
   "pri": {
     "type": "component"
