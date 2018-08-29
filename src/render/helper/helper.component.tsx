@@ -153,6 +153,8 @@ export default class RenderHelper extends React.Component<Props, State> {
     //   }
     // })
 
+    //
+
     return React.createElement(this.componentClass, _.merge({}, this.componentClass.defaultProps, props), childs);
   }
 
