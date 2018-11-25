@@ -1,6 +1,6 @@
 {
   "name": "gaea-render",
-  "version": "1.0.23",
+  "version": "1.0.28",
   "description": "",
   "main": "dist/src/index.js",
   "scripts": {
@@ -9,7 +9,6 @@
     "preview": "pri preview",
     "analyse": "pri analyse",
     "test": "pri test",
-    "prepublishOnly": "npm run build",
     "docs": "pri docs",
     "format": "tslint --fix './src/**/*.?(ts|tsx)' && prettier --write './src/**/*.?(ts|tsx)'",
     "bundle": "pri bundle"
