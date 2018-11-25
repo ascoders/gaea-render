@@ -21,14 +21,17 @@
       "pri/*": [
         "pri",
         ".temp/types/*"
+      ],
+      "@/*": [
+        "src/*"
       ]
     }
   },
   "include": [
     ".temp/**/*",
     "src/**/*",
-    "config/**/*",
-    "tests/**/*"
+    "tests/**/*",
+    "docs/**/*"
   ],
   "exclude": [
     "node_modules",
