@@ -1,5 +1,5 @@
-import Component from '../src/index';
 import * as React from 'react';
+import Component from '../src/index';
 
 class Props {}
 
